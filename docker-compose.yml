@@ -1,0 +1,45 @@
+version: "4.0"
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx:/usr/share/nginx/html
+      - ./backend:/var/www/backend
+      - ./frontend:/var/www/frontend
+    depends_on:
+      - backend
+      - frontend
+  backend:
+    image: php:7.4-fpm
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=e-learning
+      - DB_USERNAME=test
+      - DB_PASSWORD=test
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./backend:/var/www/backend
+  frontend:
+    image: node:latest
+    volumes:
+      - ./frontend:/var/www/frontend
+    command: npm run dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: e-learning
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    volumes:
+      - ./mysql:/var/lib/mysql
+volumes:
+  db:
